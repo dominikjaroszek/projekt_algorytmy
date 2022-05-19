@@ -36,7 +36,10 @@ int import_data(int **tab){
             int size_counter=100;
             int temp=-1;
             *tab = (int *)realloc(*tab,sizeof(int)*size_counter);
-            if(import!=NULL){
+            if(import==NULL){
+                puts("Brak pliku do importu");
+                return -1;
+            }else{
                 while(!feof(import)){
 
                         if(N%100==0){
@@ -87,29 +90,31 @@ void save_result(FILE *f, int *tab, int N,char text[]){
 
 void draw_result(int tab[], int elements)
 {
-    al_init();
-    al_install_keyboard();
-    al_init_primitives_addon();
+    /*al_init();
+    //al_install_keyboard();
+    al_init_primitives_addon();*/
 
-    ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();
-    ALLEGRO_DISPLAY* disp = al_create_display(720, 480);
+   /* ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();
+    ALLEGRO_DISPLAY* disp = al_create_display(960, 530);*/
 
-    int size=720/elements;
+    int size=960/elements;
     int j=0;
-    al_clear_to_color(al_map_rgb(0, 0, 0));
+    al_clear_to_color(al_map_rgb(0,0,0));
     for(int i=0;i<elements;i++)
     {
-        al_draw_filled_rectangle(j, 480, j+size, 480-tab[i], al_map_rgb(0,0,255));
+        al_draw_filled_rectangle(j, 530, j+size, 530-tab[i], al_map_rgb(80,90,200));
         j+=size;
         al_flip_display();
     }
-    al_rest(0.25);
-    al_destroy_display(disp);
-    al_destroy_event_queue(queue);
+   // al_rest(0.05);
+   /* al_destroy_display(disp);
+    al_destroy_event_queue(queue);*/
 }
 
 void sort_bablekowe_draw(int *unsorted_tab,int N)
 {
+    al_init();
+    al_init_primitives_addon();
     int *tab = (int *)malloc(sizeof(int)*N);
 
     for(int i=0;i<N;i++){
@@ -117,6 +122,8 @@ void sort_bablekowe_draw(int *unsorted_tab,int N)
     }
     int temp=0;
 
+    ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();
+    ALLEGRO_DISPLAY* disp = al_create_display(960, 530);
         for (int i = 0; i<N-1; i++)
         {
             for (int j=0; j<N-1-i; j++)
@@ -130,7 +137,11 @@ void sort_bablekowe_draw(int *unsorted_tab,int N)
                 }
             }
             draw_result(tab,N);
+            al_rest(0.10);
         }
+    al_rest(0.50);
+    al_destroy_display(disp);
+    al_destroy_event_queue(queue);
 }
 
 void sort_bablekowe(int *unsorted_tab,int N,FILE *plik){
@@ -164,9 +175,7 @@ void sort_bablekowe(int *unsorted_tab,int N,FILE *plik){
      stop=clock();
     float time_oper=((double)(stop - start))/CLK_TCK;
 
-    for(int i=0;i<N;i++){
-       // printf("%d ", tab[i]);
-    }
+
     save_result(plik,tab,N,"\nSortowana bablekowo:\n");
     save_data("Babelkowe",N,tab[0],tab[N-1],time_oper,count);
 
@@ -176,6 +185,10 @@ void sort_bablekowe(int *unsorted_tab,int N,FILE *plik){
 
 void sort_quicksort_draw(int unsorted_tab[],int N)
 {
+    al_init();
+    al_init_primitives_addon();
+    ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();
+    ALLEGRO_DISPLAY* disp = al_create_display(960, 530);
     int partition_draw(int T[], int l, int r)
     {
         int temp;
@@ -192,6 +205,7 @@ void sort_quicksort_draw(int unsorted_tab[],int N)
                 T[j]=temp;
             }
             draw_result(T,N);
+            al_rest(0.10);
         }
         temp=T[i+1];
         T[i+1]=T[r];
@@ -219,6 +233,9 @@ void sort_quicksort_draw(int unsorted_tab[],int N)
     }
     unsigned long int count=0;
     quicksort_draw(tab,0,N-1);
+    al_rest(0.5);
+    al_destroy_display(disp);
+    al_destroy_event_queue(queue);
 }
 
 
@@ -317,16 +334,20 @@ int main()
         exit(0);
     }
 
+    if(elements>0)
+    {
+        FILE *plik;
+        plik=fopen("sort_data/tablica.txt","w+");
+        save_result(plik,unsorted_tab,elements,"Wylosowana/importowana tablica:\n");
 
-    FILE *plik;
-    plik=fopen("sort_data/tablica.txt","w+");
-    save_result(plik,unsorted_tab,elements,"Wylosowana/importowana tablica:\n");
 
+        sort_quicksort(unsorted_tab,elements, plik);
+        sort_bablekowe(unsorted_tab,elements, plik);
 
-    sort_quicksort(unsorted_tab,elements, plik);
-    sort_bablekowe(unsorted_tab,elements, plik);
-
-    free(unsorted_tab);
-    fclose(plik);
+        free(unsorted_tab);
+        fclose(plik);
+    }
+    else
+        printf("\n\t\t##ERROR##\n");
     return 0;
 }
