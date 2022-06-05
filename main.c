@@ -7,6 +7,15 @@
 #include <stdbool.h>
 
 void losuj(int *tab, int N){
+    /**
+    *\brief Funkcja losujaca
+    *\param tab Wskaznik na tablice
+    *\param N Liczba elementow tablicy
+    *
+    * Funkcja wypelniajaca tablica N elementow liczbami losowymi z zakresu podanego przez uzytkownika.
+    *
+    */
+
     srand(time(0));
 
     int H, L;
@@ -28,13 +37,22 @@ void losuj(int *tab, int N){
 }
 
 int import_data(int **tab){
+    /**
+    * \brief Funkcja importujaca
+    * \param tab podwojny wskaznik na tablice
+    *
+    * Funkcja importuje tablice z pliku tekstowego oraz sprawdza czy plik nie jest uszkodzony. W przypadku gdy plik nie istnieje oraz gdy plik jest uszkodzony funkcja zwraca wartosc -1, gdy import zakonczy sie pomyslnie funkcja zwraca ilosc elementow zaimportowanej tablicy.
+    *
+    * \return -1 lub N
+    */
 
         FILE *import;
         import=fopen("sort_data/import.txt","r");
 
             int N=0;
             int size_counter=100;
-            int temp=-1;
+            char temp[40];
+
             *tab = (int *)realloc(*tab,sizeof(int)*size_counter);
             if(import==NULL){
                 puts("Brak pliku do importu");
@@ -47,8 +65,16 @@ int import_data(int **tab){
                             *tab = (int *)realloc(*tab,sizeof(int)*size_counter);
                         }
 
-                    fscanf(import,"%d",&temp);
-                    (*tab)[N]=temp;
+                    fscanf(import,"%s",&temp);
+                    for(int i = 0; i < strlen(temp); i++)
+                    {
+                        if(!isdigit(temp[i]))
+                        {
+                            printf("Plik uszkodzony");
+                            return -1;
+                        }
+                    }
+                    (*tab)[N]=atoi(temp);
                     printf("%d ", (*tab)[N]);
                     N++;
                 }
@@ -60,6 +86,20 @@ int import_data(int **tab){
 }
 
 void save_data(char typ[], int size, int low, int high, float time, int operations){
+    /**
+    * \brief Funkcja zapisujaca dane do pliku
+    * \param typ[] wykorzystywany algorytm przy sortowaniu
+    * \param size liczba elementow sortowanej tablicy
+    * \param low najmniejszy element sortowanej tablicy
+    * \param high najwiekszy element sortowanej tablicy
+    * \param time czas sortowania
+    * \param operations liczba operacji zamiany
+    *
+    * Funkcja zapisuje do pliku informacje o ilosci elementow, zakresie losowania, czasie jaki dany rodzaj sortowania potrzebowal oraz ilosci operacji zamiany.
+    *
+    */
+
+            //
 
     FILE *data;
 
@@ -81,6 +121,16 @@ void save_data(char typ[], int size, int low, int high, float time, int operatio
 }
 
 void save_result(FILE *f, int *tab, int N,char text[]){
+    /**
+    * \brief Funkcja zapisujaca tablice do pliku
+    * \param f wskaznik na plik
+    * \param tab wskaznik na tablice
+    * \param N liczba elementow
+    * \param tekst[] informacja czy oraz jak tablica zostala posortowana
+    *
+    * Funkcja zapisuje do pliku w pierwszej kolejnosci tekst podany przez parametr tekst[], a nastepnie tablice przekazana przez wskaznik.
+    *
+    */
 
     fprintf(f,"%s ",text);
     for(int i=0;i<N;i++){
@@ -90,13 +140,14 @@ void save_result(FILE *f, int *tab, int N,char text[]){
 
 void draw_result(int tab[], int elements)
 {
-    /*al_init();
-    //al_install_keyboard();
-    al_init_primitives_addon();*/
-
-   /* ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();
-    ALLEGRO_DISPLAY* disp = al_create_display(960, 530);*/
-
+    /**
+    * \brief Funkcja rysujaca
+    * \param tab[] sortowana tablica
+    * \param elements liczba elementow tablicy
+    *
+    * Funkcja przedstawia sortowana tabele w postaci wykresow slupkowych.
+    *
+    */
     int size=960/elements;
     int j=0;
     al_clear_to_color(al_map_rgb(0,0,0));
@@ -106,13 +157,15 @@ void draw_result(int tab[], int elements)
         j+=size;
         al_flip_display();
     }
-   // al_rest(0.05);
-   /* al_destroy_display(disp);
-    al_destroy_event_queue(queue);*/
 }
 
 void sort_bablekowe_draw(int *unsorted_tab,int N)
 {
+    /**
+    * \brief Funkcja przedstawiajaca w sposob graficzny proces sortowania babelkowego.
+    * \param unsorted_tab wskaznik na nieposortowana tablice
+    * \param N liczba elementow tablicy
+    */
     al_init();
     al_init_primitives_addon();
     int *tab = (int *)malloc(sizeof(int)*N);
@@ -145,6 +198,16 @@ void sort_bablekowe_draw(int *unsorted_tab,int N)
 }
 
 void sort_bablekowe(int *unsorted_tab,int N,FILE *plik){
+    /**
+    * \brief Sortowanie babelkowe
+    * \param unsorted_tab wskaznik na nieposortowana tablice
+    * \param N liczba elementow tablicy
+    * \param plik wskaznik na plik w ktorym ma zostac zapisana posortowana tablica
+    *
+    * Funkcja sortuje tablice podana przez parametr przy uzyciu algorytmu sortowania babelkowego.
+    *
+    */
+
 
     int *tab = (int *)malloc(sizeof(int)*N);
 
@@ -185,6 +248,11 @@ void sort_bablekowe(int *unsorted_tab,int N,FILE *plik){
 
 void sort_quicksort_draw(int unsorted_tab[],int N)
 {
+    /**
+    * \brief Funkcja przedstawiajaca w sposob graficzny proces sortowania szybkiego.
+    * \param unsorted_tab wskaznik na nieposortowana tablice
+    * \param N liczba elementow tablicy
+    */
     al_init();
     al_init_primitives_addon();
     ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();
@@ -242,6 +310,16 @@ void sort_quicksort_draw(int unsorted_tab[],int N)
 
 void sort_quicksort(int *unsorted_tab,int N,FILE *plik){
 
+    /**
+    * \brief Sortowanie szybkie
+    * \param unsorted_tab wskaznik na nieposortowana tablice
+    * \param N liczba elementow tablicy
+    * \param plik wskaznik na plik w ktorym ma zostac zapisana posortowana tablica
+    *
+    * Funkcja sortuje tablice podana przez parametr przy uzyciu algorytmu sortowania szybkiego.
+    *
+    */
+
     int partition(int T[], int l, int r, int *count){
         int temp;
         int pivot = T[r];
@@ -290,9 +368,6 @@ void sort_quicksort(int *unsorted_tab,int N,FILE *plik){
     stop=clock();
     float time_oper=((double)(stop - start))/CLK_TCK;
 
-    for(int i=0;i<N;i++){
-       // printf("%d ", tab[i]);
-    }
     save_result(plik,tab,N,"\nSortowana quicksort:\n");
     save_data("Quicksort",N,tab[0],tab[N-1],time_oper,count);
 
@@ -300,6 +375,87 @@ void sort_quicksort(int *unsorted_tab,int N,FILE *plik){
     printf("Czas operacji zamiany - quicksort: %f",time_oper);
 
 }
+
+void sort_heapsort(int *unsorted_tab,int N,FILE *plik)
+{
+    /**
+    * \brief Sortowanie przez kopcowanie
+    * \param unsorted_tab wskaznik na nieposortowana tablice
+    * \param N liczba elementow tablicy
+    * \param plik wskaznik na plik w ktorym ma zostac zapisana posortowana tablica
+    *
+    * Funkcja sortuje tablice podana przez parametr przy uzyciu algorytmu sortowania przez kopcowanie.
+    *
+    */
+    int *tab = (int *)malloc(sizeof(int)*N);
+    for(int i=0;i<N;i++){
+        tab[i]=unsorted_tab[i];
+    }
+
+    int left(int index){return (index << 1) + 1;}
+    int right(int index){return (index << 1) + 2;}
+
+    void heapify(int t[], int i, int size, int **count)
+    {
+        int largest, l, r;
+        int tmp;
+        l=left(i);
+        r=right(i);
+        largest=i;
+        if(l<size)
+            if(t[l]>t[largest])largest=l;
+        if(r<size)
+            if(t[r]>t[largest])largest=r;
+        if (largest!=i)
+        {
+            tmp=t[i];
+            t[i]=t[largest];
+            t[largest]=tmp;
+            (*count)++;
+            heapify(t, largest, size,&count);
+        }
+    }
+
+
+    void build_heap(int t[], int size, int *count)
+    {
+    int i;
+    for(i=size/2-1; i>=0; i--)
+    heapify(t, i, size,&(*count));
+    }
+
+
+    int heapsort(int t[], int size)
+    {
+        int i, tmp;
+        int count=0;
+        build_heap(t, size,&count);
+        for(i=size-1; i>=0; i--)
+        {
+            tmp=t[0];
+            t[0]=t[i];
+            t[i]=tmp;
+            count++;
+            heapify(t, 0, i,&count);
+        }
+        return count;
+    }
+
+    unsigned long int count=0;
+    clock_t start, stop;
+    printf("\nSortuje przy uzyciu algorytmu heapsort");
+    start=clock();
+        count=heapsort(tab,N);
+    stop=clock();
+    float time_oper=((double)(stop - start))/CLK_TCK;
+
+    save_result(plik,tab,N,"\nSortowana heapsort:\n");
+    save_data("Heapsort",N,tab[0],tab[N-1],time_oper,count);
+
+    printf("\nLiczba operacji zamiany - heapsort: %lu\n",count);
+    printf("Czas operacji zamiany - heapsort: %f",time_oper);
+}
+
 
 int main()
 {
@@ -342,6 +498,7 @@ int main()
 
 
         sort_quicksort(unsorted_tab,elements, plik);
+        sort_heapsort(unsorted_tab,elements,plik);
         sort_bablekowe(unsorted_tab,elements, plik);
 
         free(unsorted_tab);
