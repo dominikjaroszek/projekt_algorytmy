@@ -1,0 +1,10 @@
+# depslib dependency file v1.0
+1654376387 source:c:\users\dominik\desktop\aisd\main.c
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+	"allegro5/allegro5.h"
+	"allegro5/allegro_font.h"
+	"allegro5/allegro_primitives.h"
+	<stdbool.h>
+
